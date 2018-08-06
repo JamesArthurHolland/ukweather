@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">UKWeather</string>
+    <string name="text_location_permission">Would you like to grant UKWeather access to your location, to give you more convenient weather updates?</string>
+    <string name="title_location_permission">Allow UKWeather to access location settings?</string>
+    <string name="ok">OK</string>
+    <string name="not_now">Not now</string>
+    <string name="Use_current_location">Use current location?</string>
+</resources>
