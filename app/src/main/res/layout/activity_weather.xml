@@ -14,87 +14,26 @@
         android:padding="@dimen/material_component_cards_padding_from_edge_of_screen_to_card"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="8dp"
         android:ems="10"/>
 
-    <TableLayout android:id="@+id/forecast_table"
-                 android:layout_below="@id/city_search"
-                 android:layout_width="fill_parent"
-                 android:layout_height="fill_parent" >
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_below="@id/city_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/MyCustomTabLayout"/>
 
-        <!-- 2 columns -->
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dip">
-
-            <TextView
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall"/>
-            <TextView
-                android:text="1am"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall"/>
-            <TextView
-                android:text="4am"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="7am"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="10am"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="1pm"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="4pm"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="7pm"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView
-                android:text="10pm"
-                android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
-                android:paddingRight="@dimen/material_component_grid_lists_padding_small"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </TableRow>
-        <!--<TableRow-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:padding="5dip" >-->
-
-            <!--<TextView-->
-                <!--android:text="Today"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:textAppearance="?android:attr/textAppearanceSmall" />-->
-            <!--<TextView-->
-                <!--android:id="@+id/row1_col1"-->
-                <!--android:text="@string/wi_day_sunny"/>-->
-
-        <!--</TableRow>-->
-
-
-    </TableLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_below="@id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white" />
 
     <Button
         android:id="@+id/use_current_location"
-        android:text="@string/title_location_permission"
+        android:text="@string/Use_current_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>

@@ -1,224 +1,224 @@
 package ukweather.ukweather;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
-import com.github.davidmoten.rtree.RTree;
 import com.github.davidmoten.rtree.geometry.Geometries;
 import com.github.davidmoten.rtree.geometry.Point;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.github.davidmoten.rtree.geometry.internal.PointDouble;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.format.DateTimeFormatter;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import ukweather.ukweather.model.WeatherCondition;
+import ukweather.ukweather.model.CurrentWeather;
 import ukweather.ukweather.model.WeatherForecast;
 import ukweather.ukweather.retrofitClient.RetrofitClient;
 
-import static java.lang.Math.floor;
-
 public class WeatherActivity extends AppCompatActivity
 {
-    private ArrayList<City> mCities;
-    private RTree<String, Point> mRtree;
-    private TableLayout mForecastTable;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
+    private ViewPagerAdapter mAdapter;
+    private City mSelectedCity;
 
     @Inject
     RetrofitClient mRetrofitClient;
 
+    @Inject
+    CityService mCityService;
+
+    @Inject
+    SharedPreferencesManager sharedPreferencesManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        switchToGrantPermissionsActivityIfNoLocationPermissions();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         ((UKWeatherApp) getApplication()).getDiComponent().inject(this);
 
-        mForecastTable = (TableLayout) findViewById(R.id.forecast_table);
+
+        if (sharedPreferencesManager.getSkippedPermissions() == false) {
+            switchToGrantPermissionsActivityIfNoLocationPermissions();
+        }
 
 
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager();
 
-//        parseCitiesFromAssetsFile();
-//        mRtree = RTree.create();
-//        createRTreeFromCities();
-//
-//        PointDouble guessPoint = PointDouble.create(54.769876, -6.092390);
-//
-//
-////        String name = list.size();
-//
-//        AutoCompleteTextView citySearch = findViewById(R.id.city_search);
-//        ArrayAdapter<City> citySearchAutoCompleteAdapter = new ArrayAdapter<City>(
-//            this,
-//            android.R.layout.simple_dropdown_item_1line, mCities
-//        );
-//        citySearch.setAdapter(citySearchAutoCompleteAdapter);
-//
-//        Button useCurrentLocation = findViewById(R.id.use_current_location);
-//        useCurrentLocation.setOnClickListener((View view) -> {
-//            List<Entry<String, Point>> list = mRtree.nearest(guessPoint, Integer.MAX_VALUE, 1).toList().toBlocking().single();
-//            int size = list.size();
-//            int id = Integer.parseInt(list.get(0).value());
-//            if (size > 0) {
-//                Log.d("WeatherActivity id is", "" + id);
-//            } else {
-//                // TODO show error message
-//            }
-//        });
-
-        Button useCurrentLocation = findViewById(R.id.use_current_location);
-        useCurrentLocation.setOnClickListener((View view) -> {
-            mRetrofitClient.getWeather("2651210")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(weatherForecast -> updateWeatherForecast(weatherForecast));
+        AutoCompleteTextView citySearch = findViewById(R.id.city_search);
+        ArrayAdapter<City> citySearchAutoCompleteAdapter = new ArrayAdapter<City>(
+            this,
+            android.R.layout.simple_dropdown_item_1line,
+            mCityService.mCities
+        );
+        citySearch.setAdapter(citySearchAutoCompleteAdapter);
+        citySearch.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
+            Object item = parent.getItemAtPosition(position);
+            if(item instanceof City) {
+                mSelectedCity = (City) item;
+                getWeather();
+            }
         });
 
-
-
+        Button useCurrentLocation = findViewById(R.id.use_current_location);
+        if (sharedPreferencesManager.getSkippedPermissions()) {
+            useCurrentLocation.setEnabled(false);
+        }
+        useCurrentLocation.setOnClickListener((View view) -> {
+            mSelectedCity = mCityService.getNearestCity(getGPS());
+            citySearch.setText(mSelectedCity.name);
+            getWeather();
+        });
     }
 
-    private void updateWeatherForecast(WeatherForecast weatherForecast)
+    private void getWeather()
     {
-        ArrayList<WeatherCondition> weatherConditions = weatherForecast.conditions;
+        if(mSelectedCity == null) {
+            return;
+        }
+        int current = mViewPager.getCurrentItem();
+        if(current == 0) { // Current Weather
+            mRetrofitClient.getCurrentWeatherInfo("" + mSelectedCity.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(weatherForecast -> updateCurrentWeather(weatherForecast));
+        }
+        else if(current == 1) {
+            mRetrofitClient.get5DayWeatherInfo("" + mSelectedCity.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(weatherForecast -> updateWeatherForecast(mSelectedCity, weatherForecast));
+        }
+    }
 
-        TreeMap<String, ArrayList<WeatherCondition>> days = new TreeMap<>();
-        while(weatherConditions.isEmpty() == false) {
-            WeatherCondition condition = weatherConditions.remove(0);
-            String date = condition.dateTime.toLocalDate().toString();
+    private PointDouble getGPS() {
+        LocationManager lm = (LocationManager) getSystemService(
+            Context.LOCATION_SERVICE);
+        List<String> providers = lm.getProviders(true);
 
-            ArrayList<WeatherCondition> dayConditions = days.get(date);
-            if(dayConditions == null) {
-                dayConditions = new ArrayList<>();
+        Location locations = null;
+
+        for (int i = providers.size() - 1; i >= 0; i--) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locations = lm.getLastKnownLocation(providers.get(i));
+                if (locations != null) break;
             }
-            dayConditions.add(condition);
-            days.put(date, dayConditions);
-
-            Log.d("WeatherActivity", condition.dateTime.toLocalDate().toString());
-            Log.d("WeatherActivity2", "" + condition.dateTime.toLocalDate().toEpochDay());
-            Log.d("WeatherActivity", "" + condition.dateTime.toLocalDate().toEpochDay());
         }
-        Log.d("RetrofitClient", "asdfasdf");
+        double lat;
+        double lon;
+        if (locations != null) {
+            lat = locations.getLatitude();
+            lon = locations.getLongitude();
+            return PointDouble.create(lat, lon);
+        }
+        return null;
+    }
 
-        boolean firstTableRowInserted = false;
-        for(Map.Entry<String,ArrayList<WeatherCondition>> entry : days.entrySet()) {
-            TableRow row = new TableRow(this);
-            if(firstTableRowInserted) {
-                TextView dateTextView = new TextView(this);
-                LocalDate localDate = LocalDate.parse(entry.getKey());
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM");
-                String date = localDate.format(formatter);
+    private void updateCurrentWeather(CurrentWeather forecast)
+    {
+        int id = mViewPager.getCurrentItem();
+        Fragment currentFragment = mAdapter.getItem(id);
 
-                dateTextView.setText(date);
-                row.addView(dateTextView);
-                ArrayList<WeatherCondition> dayConditions = entry.getValue();
-                setConditionsForRemainingRows(row, dayConditions);
+        if(currentFragment instanceof CurrentDayWeatherForecastListener) {
+            mAdapter.notifyDataSetChanged();
+            ((CurrentDayWeatherForecastListener)currentFragment).onWeatherUpdated(forecast);
+        }
+    }
+
+    private void updateWeatherForecast(City city, WeatherForecast forecast)
+    {
+        int id = mViewPager.getCurrentItem();
+        Fragment currentFragment = mAdapter.getItem(id);
+
+        if(currentFragment instanceof MultiDayWeatherForecastListener) {
+            mAdapter.notifyDataSetChanged();
+            ((MultiDayWeatherForecastListener)currentFragment).onWeatherUpdated(city, forecast);
+        }
+    }
+
+    private void setupViewPager() {
+        mAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mAdapter.addFragment(new CurrentWeatherFragment(), "Current Weather");
+        mAdapter.addFragment(new MultiDayForecastFragment(), "5 day forecast");
+        mViewPager.setAdapter(mAdapter);
+        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
+        {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
-            else {
-                TextView dateTextView = new TextView(this);
-                dateTextView.setText("Today"); // TODO
-                row.addView(dateTextView);
-                ArrayList<WeatherCondition> dayConditions = entry.getValue();
-                setEmptyCellsInFirstRow(row, dayConditions);
-                setConditionsForRemainingRows(row, dayConditions);
-                firstTableRowInserted = true;
+
+            @Override
+            public void onPageSelected(int position) {
+                getWeather();
             }
-            mForecastTable.addView(row);
-        }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
-    private void setEmptyCellsInFirstRow(TableRow row, ArrayList<WeatherCondition> dayConditions) {
-        int numberOfEmptyCells = WeatherCondition.times.length - dayConditions.size();
-        for(int i = 0; i < numberOfEmptyCells; i++) {
-            TextView textView = new TextView(this);
-            row.addView(textView);
+    class ViewPagerAdapter extends FragmentStatePagerAdapter
+    {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
         }
-    }
 
-    private void setConditionsForRemainingRows(TableRow row, ArrayList<WeatherCondition> dayConditions) {
-        for(WeatherCondition condition : dayConditions) {
-            TextView textView = new TextView(this);
-            setWeatherIconForTextView(condition, textView);
-            textView.setGravity(Gravity.CENTER);
-            Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/weathericons-regular-webfont.ttf");
-            textView.setTypeface(custom_font);
-            row.addView(textView);
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
         }
-    }
 
-    private void setWeatherIconForTextView(WeatherCondition condition, TextView textView) {
-        int code = (int) floor(condition.metaInfo.get(0).id / 100);
-        switch(code) {
-            case 2:
-                textView.setText(R.string.wi_thunderstorm);
-                break;
-            case 3:
-                textView.setText(R.string.wi_rain);
-                break;
-            case 5:
-                textView.setText(R.string.wi_rain);
-                break;
-            case 6:
-                textView.setText(R.string.wi_snow);
-                break;
-            case 7:
-                textView.setText(R.string.wi_smog);
-                break;
-            case 8:
-                textView.setText(R.string.wi_day_sunny);
-                break;
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
         }
-    }
 
-    private void parseCitiesFromAssetsFile() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(City.class, new CityDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        AssetManager assetManager = getAssets();
-        try {
-            InputStream inputStream = assetManager.open("ukcities.json");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            mCities = gson.fromJson(bufferedReader, new TypeToken<ArrayList<City>>()
-            {
-            }.getType()); // line 6
-            Log.d("Weather Activity", "DBG");
-        } catch (IOException e) {
-            e.printStackTrace();
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
         }
-    }
 
-    private void createRTreeFromCities() {
-        for (City city : mCities) {
-            int id = city.id;
-            Point point = city.coordinates;
-            mRtree = mRtree.add("" + id, Geometries.point(point.x(), point.y()));
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
     }
 
@@ -231,4 +231,13 @@ public class WeatherActivity extends AppCompatActivity
         }
     }
 
+    public interface CurrentDayWeatherForecastListener
+    {
+        void onWeatherUpdated(CurrentWeather forecast);
+    }
+
+    public interface MultiDayWeatherForecastListener
+    {
+        void onWeatherUpdated(City city, WeatherForecast forecast);
+    }
 }

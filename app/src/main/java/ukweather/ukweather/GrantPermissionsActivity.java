@@ -15,15 +15,17 @@ import android.view.Window;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import javax.inject.Inject;
+
 public class GrantPermissionsActivity extends AppCompatActivity
 {
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 0;
+    @Inject
+    SharedPreferencesManager sharedPreferencesManager;
 
     protected void switchToWeatherActivity()
     {
         Intent i = new Intent(this, WeatherActivity.class);
         startActivity(i);
-        finish();
     }
 
     @Override
@@ -31,48 +33,21 @@ public class GrantPermissionsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_landing);
+        ((UKWeatherApp) getApplication()).getDiComponent().inject(this);
 
-        final RxPermissions rxPermissions = new RxPermissions(GrantPermissionsActivity.this); // where this is an Activity or Fragment instance
-        // Must be done during an initialization phase like onCreate
+        final RxPermissions rxPermissions = new RxPermissions(GrantPermissionsActivity.this);
         RxView.clicks(findViewById(R.id.enable_location))
             .compose(rxPermissions.ensure(Manifest.permission.ACCESS_COARSE_LOCATION))
             .subscribe(granted -> {
-                if(granted) {
-                    Log.d("PermActivity", "granted");
-                }
-                else{
-                    Log.d("PermActivity", "denied");
-                }
+                sharedPreferencesManager.setSkippedPermissions(false);
                 switchToWeatherActivity();
+                finish();
             });
 
         RxView.clicks(findViewById(R.id.not_now))
             .subscribe(granted -> {
+                sharedPreferencesManager.setSkippedPermissions(true);
                 switchToWeatherActivity();
             });
     }
-
-
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if (ContextCompat.checkSelfPermission(this,
-//            Manifest.permission.ACCESS_FINE_LOCATION)
-//            == PackageManager.PERMISSION_GRANTED) {
-//
-//            locationManager.requestLocationUpdates(provider, 400, 1, this);
-//        }
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        if (ContextCompat.checkSelfPermission(this,
-//            Manifest.permission.ACCESS_FINE_LOCATION)
-//            == PackageManager.PERMISSION_GRANTED) {
-//
-//            locationManager.removeUpdates(this);
-//        }
-//    }
 }

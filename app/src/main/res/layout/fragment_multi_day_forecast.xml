@@ -1,0 +1,75 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="ukweather.ukweather.MultiDayForecastFragment">
+
+    <LinearLayout
+        android:id="@+id/forecast_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+        <TextView
+            android:id="@+id/city_name"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TableLayout android:id="@+id/forecast_table"
+                     android:layout_width="fill_parent"
+                     android:layout_height="fill_parent">
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:text="1am"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:text="4am"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="7am"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="10am"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="1pm"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="4pm"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="7pm"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                <TextView
+                    android:text="10pm"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</FrameLayout>

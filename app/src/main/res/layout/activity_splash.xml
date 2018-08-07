@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:paddingLeft="@dimen/material_component_cards_top_and_bottom_padding"
+              android:paddingRight="@dimen/material_component_cards_top_and_bottom_padding"
+              android:paddingTop="@dimen/material_component_cards_top_and_bottom_padding"
+              android:paddingBottom="@dimen/material_component_cards_top_and_bottom_padding"
+              android:background="@color/material_blue_300">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/material_grey_400"
+        android:text="@string/Loading_please_wait"
+        android:gravity="center_horizontal"
+        android:layout_weight="0.1"/>
+
+    <ProgressBar
+        android:layout_width="@dimen/material_component_floating_action_button_size"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@drawable/progress"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:visibility="visible"/>
+
+</LinearLayout>

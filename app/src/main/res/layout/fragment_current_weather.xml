@@ -1,0 +1,105 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="ukweather.ukweather.CurrentWeatherFragment">
+
+    <LinearLayout
+        android:id="@+id/forecast_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible">
+        <TextView
+            android:id="@+id/city_name"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TableLayout android:id="@+id/forecast_table"
+                     android:layout_width="fill_parent"
+                     android:layout_height="fill_parent">
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:text="Date"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/date"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:text="Max temperature"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/temp_max"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:text="Min temperature"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/temp_min"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:text="Sunrise"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/sun_rise"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dip">
+
+                <TextView
+                    android:text="Sunset"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/sun_set"
+                    android:paddingLeft="@dimen/material_component_grid_lists_padding_small"
+                    android:paddingRight="@dimen/material_component_grid_lists_padding_small"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+</FrameLayout>
